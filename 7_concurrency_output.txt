@@ -1,0 +1,45 @@
+--------------
+-- Part 7: Concurrency Control (Row-Level Locking)
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+START TRANSACTION
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+-- This locks row 101 so no other transaction can read or write to it until you COMMIT.
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+SELECT * FROM Room 
+WHERE room_id = 101 
+FOR UPDATE
+--------------
+
++---------+-----------+-----------------+---------------------+----------+
+| room_id | room_type | price_per_night | availability_status | hotel_id |
++---------+-----------+-----------------+---------------------+----------+
+|     101 | Deluxe    |         3500.00 | Booked              |        1 |
++---------+-----------+-----------------+---------------------+----------+
+1 row in set (0.005 sec)
+
+--------------
+UPDATE Room SET availability_status = 'Booked' WHERE room_id = 101
+--------------
+
+Query OK, 0 rows affected (0.002 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+COMMIT
+--------------
+
+Query OK, 0 rows affected (0.002 sec)
+
+Bye

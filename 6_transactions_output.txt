@@ -1,0 +1,316 @@
+--------------
+-- Transaction 1: Reservation Handling & Savepoints
+--------------
+
+Query OK, 0 rows affected (0.003 sec)
+
+--------------
+START TRANSACTION
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+UPDATE Room SET availability_status = 'Booked' WHERE room_id = 101
+--------------
+
+Query OK, 0 rows affected (0.004 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+SAVEPOINT A
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+INSERT INTO Reservation VALUES (1003, 1, 101, '2025-04-01', '2025-04-03', 'Confirmed', 7000.00)
+--------------
+
+Query OK, 1 row affected (0.004 sec)
+
+--------------
+SAVEPOINT B
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+INSERT INTO Reservation VALUES (1004, 2, 101, '2025-04-02', '2025-04-05', 'Confirmed', 9000.00)
+--------------
+
+Query OK, 1 row affected (0.002 sec)
+
+--------------
+SAVEPOINT C
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+-- To prove it works to the portal, you execute the rollbacks:
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+ROLLBACK TO B
+--------------
+
+Query OK, 0 rows affected (0.002 sec)
+
+--------------
+ROLLBACK TO A
+--------------
+
+Query OK, 0 rows affected (0.002 sec)
+
+--------------
+COMMIT
+--------------
+
+Query OK, 0 rows affected (0.029 sec)
+
+--------------
+-- Transaction 2: Payment Processing
+--------------
+
+Query OK, 0 rows affected (0.002 sec)
+
+--------------
+START TRANSACTION
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+INSERT INTO Payment VALUES (403, 1001, 7000.00, 'Card', 'Pending', CURDATE())
+--------------
+
+--------------
+SAVEPOINT A
+--------------
+
+Query OK, 0 rows affected (0.003 sec)
+
+--------------
+UPDATE Payment SET payment_status = 'Paid' WHERE payment_id = 403
+--------------
+
+Query OK, 0 rows affected (0.003 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+SAVEPOINT B
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+-- Simulating a bad update
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+UPDATE Payment SET amount = -500.00 WHERE payment_id = 403
+--------------
+
+Query OK, 1 row affected (0.003 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+--------------
+-- Reverting the bad update
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+ROLLBACK TO B
+--------------
+
+Query OK, 0 rows affected (0.002 sec)
+
+--------------
+COMMIT
+--------------
+
+Query OK, 0 rows affected (0.017 sec)
+
+--------------
+-- Transaction 3: Guest Data Update
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+START TRANSACTION
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+UPDATE Guest SET phone = '9999999999' WHERE guest_id = 1
+--------------
+
+Query OK, 1 row affected (0.007 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+--------------
+SAVEPOINT A
+--------------
+
+Query OK, 0 rows affected (0.002 sec)
+
+--------------
+-- Simulating an invalid email update
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+UPDATE Guest SET email = 'wrong_email'
+--------------
+
+--------------
+-- Revert the bad email update but keep the phone update
+--------------
+
+Query OK, 0 rows affected (0.006 sec)
+
+--------------
+ROLLBACK TO A
+--------------
+
+Query OK, 0 rows affected (0.003 sec)
+
+--------------
+COMMIT
+--------------
+
+Query OK, 0 rows affected (0.053 sec)
+
+--------------
+-- Transaction 4: Staff Salary Update
+--------------
+
+Query OK, 0 rows affected (0.002 sec)
+
+--------------
+START TRANSACTION
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+UPDATE Staff SET salary = salary + 5000 WHERE staff_id = 301
+--------------
+
+Query OK, 1 row affected (0.009 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+--------------
+SAVEPOINT A
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+-- Simulating a negative salary error
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+UPDATE Staff SET salary = -10000 WHERE staff_id = 301
+--------------
+
+--------------
+-- Revert the negative salary
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+ROLLBACK TO A
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+COMMIT
+--------------
+
+Query OK, 0 rows affected (0.033 sec)
+
+--------------
+-- Transaction 5: Booking Services (Handling Duplicates)
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+START TRANSACTION
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+-- Assuming (1001, 401) already exists from DML inserts, this will throw an error.
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+-- INSERT INTO Booking_Services VALUES (1001, 401);
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+SAVEPOINT A
+--------------
+
+Query OK, 0 rows affected (0.002 sec)
+
+--------------
+-- INSERT INTO Booking_Services VALUES (1001, 402); -- Also a duplicate
+--------------
+
+Query OK, 0 rows affected (0.015 sec)
+
+--------------
+SAVEPOINT B
+--------------
+
+Query OK, 0 rows affected (0.007 sec)
+
+--------------
+-- Inserting a fresh service
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+
+--------------
+INSERT INTO Booking_Services VALUES (1001, 403)
+--------------
+
+--------------
+ROLLBACK TO B
+--------------
+
+Query OK, 0 rows affected (0.020 sec)
+
+--------------
+ROLLBACK TO A
+--------------
+
+Query OK, 0 rows affected (0.002 sec)
+
+--------------
+COMMIT
+--------------
+
+Query OK, 0 rows affected (0.002 sec)
+
+Bye

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EaseMyStay - Admin Master Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Outfit', 'sans-serif'] }, colors: { admin: '#1e 293b', adminDark: '#0f172a', adminAccent: '#3b82f6' } } }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden font-sans">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-slate-900 text-white flex flex-col">
+        <div class="h-16 flex items-center px-6 font-bold text-xl border-b border-slate-800 tracking-wide text-adminAccent">
+            ⚡ Admin Console
+        </div>
+        <nav class="flex-1 py-4">
+            <ul class="space-y-2 px-3">
+                <li><a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="block px-4 py-3 rounded-lg bg-adminAccent font-semibold transition-all">Overview</a></li>
+                <li><a href="#" onclick="switchTab('reservations')" id="nav-reservations" class="block px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition-all font-semibold">Reservations Manager</a></li>
+                <li><a href="#" onclick="switchTab('guests')" id="nav-guests" class="block px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition-all font-semibold">Guest Directory</a></li>
+            </ul>
+        </nav>
+        <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
+            Database Logged In as Root
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden relative">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm">
+            <h1 class="text-xl font-bold text-slate-700" id="header-title">System Overview</h1>
+            <a href="index.html" class="text-sm font-bold text-blue-600 hover:underline">← Back to Public Website</a>
+        </header>
+        
+        <div class="flex-1 overflow-auto p-8 relative">
+
+            <!-- Dashboard Tab -->
+            <section id="tab-dashboard" class="block">
+                <div class="grid grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-slate-500 text-sm font-bold uppercase tracking-wider">Total Revenue</div>
+                        <div class="text-3xl font-black text-slate-800 mt-2">Active</div>
+                        <div class="text-xs text-green-500 font-bold mt-2">▲ Automatically calculated</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-slate-500 text-sm font-bold uppercase tracking-wider">Rooms Booked</div>
+                        <div class="text-3xl font-black text-slate-800 mt-2" id="dash-booked-count">Loading...</div>
+                        <div class="text-xs text-slate-400 font-bold mt-2">Based on current availability</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-slate-500 text-sm font-bold uppercase tracking-wider">Total Guests</div>
+                        <div class="text-3xl font-black text-slate-800 mt-2" id="dash-guest-count">Loading...</div>
+                        <div class="text-xs text-slate-400 font-bold mt-2">Registered in DB</div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                    <h3 class="text-lg font-bold text-blue-800 mb-2">Welcome to your Master Control</h3>
+                    <p class="text-blue-600 text-sm">Select 'Reservations Manager' or 'Guest Directory' on the left to perform complex database operations like <b>DELETE</b> and see SQL Transactions in action.</p>
+                </div>
+            </section>
+
+            <!-- Reservations Tab -->
+            <section id="tab-reservations" class="hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+                            <tr>
+                                <th class="p-4 font-bold">Booking ID</th>
+                                <th class="p-4 font-bold">Lead Guest</th>
+                                <th class="p-4 font-bold">Room</th>
+                                <th class="p-4 font-bold">Dates</th>
+                                <th class="p-4 font-bold">Financials</th>
+                                <th class="p-4 font-bold text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-reservations-table" class="divide-y divide-slate-100 text-sm">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Guests Tab -->
+            <section id="tab-guests" class="hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+                            <tr>
+                                <th class="p-4 font-bold">Guest ID</th>
+                                <th class="p-4 font-bold">Full Name</th>
+                                <th class="p-4 font-bold">Contact</th>
+                                <th class="p-4 font-bold text-right">Danger Zone</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-guests-table" class="divide-y divide-slate-100 text-sm">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+</html>
