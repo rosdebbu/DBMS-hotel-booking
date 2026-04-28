@@ -9,7 +9,12 @@ def get_rooms():
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM Room")
+            query = """
+                SELECT r.*, h.name as hotel_name, h.location, h.rating 
+                FROM Room r
+                JOIN Hotel h ON r.hotel_id = h.hotel_id
+            """
+            cursor.execute(query)
             rooms = cursor.fetchall()
             return jsonify(rooms)
     except Exception as e:
@@ -25,6 +30,31 @@ def get_reservations():
             cursor.execute("SELECT * FROM Guest_Booking_View")
             reservations = cursor.fetchall()
             return jsonify(reservations)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@guest_bp.route('/api/search', methods=['GET'])
+def search_rooms():
+    location = request.args.get('location', '')
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            query = """
+                SELECT r.*, h.name as hotel_name, h.location, h.rating 
+                FROM Room r
+                JOIN Hotel h ON r.hotel_id = h.hotel_id
+                WHERE r.availability_status = 'Available'
+            """
+            params = []
+            if location:
+                query += " AND h.location LIKE %s"
+                params.append(f"%{location}%")
+                
+            cursor.execute(query, tuple(params))
+            rooms = cursor.fetchall()
+            return jsonify(rooms)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     finally:

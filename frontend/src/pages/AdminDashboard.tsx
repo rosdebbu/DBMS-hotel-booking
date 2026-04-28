@@ -40,178 +40,185 @@ export default function AdminDashboard() {
       const [statsRes, resRes, guestsRes] = await Promise.all([
         fetch('http://localhost:5000/api/admin/stats'),
         fetch('http://localhost:5000/api/admin/reservations'),
-        fetch('http://localhost:5000/api/admin/guests')
+        fetch('http://localhost:5000/api/admin/guests'),
       ]);
       setStats(await statsRes.json());
       setReservations(await resRes.json());
       setGuests(await guestsRes.json());
     } catch (err) {
-      console.error("Error fetching admin data:", err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const handleDeleteReservation = async (id: number) => {
-    if (!confirm('Cancel this reservation? This will free the room.')) return;
+    if (!confirm('Cancel this reservation?')) return;
     try {
       await fetch(`http://localhost:5000/api/admin/reservations/${id}`, { method: 'DELETE' });
       fetchData();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const handleDeleteGuest = async (id: number) => {
     if (!confirm('Delete this guest?')) return;
     try {
       const res = await fetch(`http://localhost:5000/api/admin/guests/${id}`, { method: 'DELETE' });
-      if (!res.ok) {
-        const data = await res.json();
-        alert(data.error);
-      } else {
-        fetchData();
-      }
-    } catch (err) {
-      console.error(err);
-    }
+      if (!res.ok) { const d = await res.json(); alert(d.error); } else { fetchData(); }
+    } catch (err) { console.error(err); }
   };
 
-  if (loading) return <div className="text-center p-12 text-xl">Loading dashboard...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-400 text-lg animate-pulse">Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="animate-fade-in">
+    <div className="max-w-[1400px] mx-auto px-6 py-8">
+      <h1 className="text-white text-3xl font-bold mb-8">Admin Dashboard</h1>
+
       {/* Stats Cards */}
-      <div className="stats-grid mb-8">
-        <div className="glass-panel stat-card blue">
-          <div className="icon-wrapper blue">
-            <DollarSign size={32} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+        <div className="bg-[#2a2a2a] rounded-lg p-6 flex items-center gap-4 border-l-4 border-blue-500">
+          <div className="w-14 h-14 bg-blue-500/20 rounded-full flex items-center justify-center">
+            <DollarSign size={28} className="text-blue-400" />
           </div>
           <div>
-            <p className="stat-label">Total Revenue</p>
-            <h3 className="stat-value">${stats?.total_revenue?.toFixed(2) || '0.00'}</h3>
+            <p className="text-gray-400 text-sm">Total Revenue</p>
+            <p className="text-white text-2xl font-bold">₹{stats?.total_revenue?.toLocaleString() || '0'}</p>
           </div>
         </div>
-        <div className="glass-panel stat-card purple">
-          <div className="icon-wrapper purple">
-            <BedDouble size={32} />
+        <div className="bg-[#2a2a2a] rounded-lg p-6 flex items-center gap-4 border-l-4 border-purple-500">
+          <div className="w-14 h-14 bg-purple-500/20 rounded-full flex items-center justify-center">
+            <BedDouble size={28} className="text-purple-400" />
           </div>
           <div>
-            <p className="stat-label">Active Bookings</p>
-            <h3 className="stat-value">{stats?.active_bookings || 0}</h3>
+            <p className="text-gray-400 text-sm">Active Bookings</p>
+            <p className="text-white text-2xl font-bold">{stats?.active_bookings || 0}</p>
           </div>
         </div>
-        <div className="glass-panel stat-card pink">
-          <div className="icon-wrapper pink">
-            <Users size={32} />
+        <div className="bg-[#2a2a2a] rounded-lg p-6 flex items-center gap-4 border-l-4 border-pink-500">
+          <div className="w-14 h-14 bg-pink-500/20 rounded-full flex items-center justify-center">
+            <Users size={28} className="text-pink-400" />
           </div>
           <div>
-            <p className="stat-label">Top Room Type</p>
-            <h3 className="stat-value text-xl">{stats?.top_room_type || 'N/A'}</h3>
+            <p className="text-gray-400 text-sm">Top Room Type</p>
+            <p className="text-white text-xl font-bold">{stats?.top_room_type || 'N/A'}</p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="tabs">
-        <button 
-          className={`tab-btn ${activeTab === 'reservations' ? 'active' : ''}`}
+      <div className="flex gap-3 mb-6 border-b border-gray-700 pb-3">
+        <button
           onClick={() => setActiveTab('reservations')}
+          className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+            activeTab === 'reservations' ? 'bg-white text-gray-900' : 'text-gray-400 hover:bg-gray-800'
+          }`}
         >
           All Reservations
         </button>
-        <button 
-          className={`tab-btn ${activeTab === 'guests' ? 'active' : ''}`}
+        <button
           onClick={() => setActiveTab('guests')}
+          className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+            activeTab === 'guests' ? 'bg-white text-gray-900' : 'text-gray-400 hover:bg-gray-800'
+          }`}
         >
           Guest Directory
         </button>
       </div>
 
-      {/* Tables */}
-      <div className="glass-panel overflow-hidden">
-        {activeTab === 'reservations' ? (
-          <div className="data-table-container">
-            <table className="data-table">
+      {/* Table */}
+      <div className="bg-[#2a2a2a] rounded-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          {activeTab === 'reservations' ? (
+            <table className="w-full text-left">
               <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Guest</th>
-                  <th>Room</th>
-                  <th>Dates</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Action</th>
+                <tr className="bg-white/5 border-b border-gray-700">
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">ID</th>
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">Guest</th>
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">Room</th>
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">Dates</th>
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">Amount</th>
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">Status</th>
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {reservations.map(res => (
-                  <tr key={res.booking_id}>
-                    <td className="text-gray-400">#{res.booking_id}</td>
-                    <td className="font-medium">{res.guest_name}</td>
-                    <td>{res.room_type} (ID: {res.room_id})</td>
-                    <td className="text-sm text-gray-400">
-                      <div>In: {res.check_in}</div>
-                      <div>Out: {res.check_out}</div>
+                {reservations.map((r) => (
+                  <tr key={r.booking_id} className="border-b border-gray-800 hover:bg-white/5 transition-colors">
+                    <td className="px-5 py-4 text-gray-500 text-sm">#{r.booking_id}</td>
+                    <td className="px-5 py-4 text-white font-medium">{r.guest_name}</td>
+                    <td className="px-5 py-4 text-gray-300 text-sm">{r.room_type} (#{r.room_id})</td>
+                    <td className="px-5 py-4 text-gray-400 text-xs">
+                      <div>In: {r.check_in}</div>
+                      <div>Out: {r.check_out}</div>
                     </td>
-                    <td className="font-medium text-blue-300">${parseFloat(res.total_amount).toFixed(2)}</td>
-                    <td>
-                      <span className="status-badge">
-                        {res.status}
+                    <td className="px-5 py-4 text-blue-400 font-semibold">₹{parseFloat(r.total_amount).toLocaleString()}</td>
+                    <td className="px-5 py-4">
+                      <span className="bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-medium px-2.5 py-1 rounded-full">
+                        {r.status}
                       </span>
                     </td>
-                    <td>
-                      <button onClick={() => handleDeleteReservation(res.booking_id)} className="btn-danger action-btn" title="Cancel Reservation">
+                    <td className="px-5 py-4">
+                      <button
+                        onClick={() => handleDeleteReservation(r.booking_id)}
+                        className="text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition-colors"
+                        title="Cancel"
+                      >
                         <Trash2 size={16} />
                       </button>
                     </td>
                   </tr>
                 ))}
                 {reservations.length === 0 && (
-                  <tr><td colSpan={7} className="p-8 text-center text-gray-400">No active reservations</td></tr>
+                  <tr><td colSpan={7} className="px-5 py-12 text-center text-gray-500">No reservations</td></tr>
                 )}
               </tbody>
             </table>
-          </div>
-        ) : (
-          <div className="data-table-container">
-            <table className="data-table">
+          ) : (
+            <table className="w-full text-left">
               <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>Email</th>
-                  <th>ID Proof</th>
-                  <th>Action</th>
+                <tr className="bg-white/5 border-b border-gray-700">
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">ID</th>
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">Name</th>
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">Phone</th>
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">Email</th>
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">ID Proof</th>
+                  <th className="px-5 py-3 text-gray-400 text-sm font-medium">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {guests.map(guest => (
-                  <tr key={guest.guest_id}>
-                    <td className="text-gray-400">#{guest.guest_id}</td>
-                    <td className="font-medium">{guest.name}</td>
-                    <td>{guest.phone}</td>
-                    <td>{guest.email}</td>
-                    <td>{guest.id_proof}</td>
-                    <td>
-                      <button onClick={() => handleDeleteGuest(guest.guest_id)} className="btn-danger action-btn" title="Delete Guest">
+                {guests.map((g) => (
+                  <tr key={g.guest_id} className="border-b border-gray-800 hover:bg-white/5 transition-colors">
+                    <td className="px-5 py-4 text-gray-500 text-sm">#{g.guest_id}</td>
+                    <td className="px-5 py-4 text-white font-medium">{g.name}</td>
+                    <td className="px-5 py-4 text-gray-300">{g.phone}</td>
+                    <td className="px-5 py-4 text-gray-300">{g.email}</td>
+                    <td className="px-5 py-4 text-gray-300">{g.id_proof}</td>
+                    <td className="px-5 py-4">
+                      <button
+                        onClick={() => handleDeleteGuest(g.guest_id)}
+                        className="text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition-colors"
+                        title="Delete"
+                      >
                         <Trash2 size={16} />
                       </button>
                     </td>
                   </tr>
                 ))}
                 {guests.length === 0 && (
-                  <tr><td colSpan={6} className="p-8 text-center text-gray-400">No guests found</td></tr>
+                  <tr><td colSpan={6} className="px-5 py-12 text-center text-gray-500">No guests</td></tr>
                 )}
               </tbody>
             </table>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
