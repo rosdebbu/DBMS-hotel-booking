@@ -1,6 +1,6 @@
 import pymysql
 from dbutils.pooled_db import PooledDB
-from .config import Config
+from config import Config
 
 pool = None
 

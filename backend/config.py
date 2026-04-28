@@ -9,4 +9,4 @@ class Config:
     MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', '1234')
     MYSQL_DB = os.getenv('MYSQL_DB', 'Hotel_Management_System')
     SECRET_KEY = os.getenv('SECRET_KEY', 'my-super-secret-key-1234')
-    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:5173')
+    CORS_ORIGINS = os.getenv('CORS_ORIGINS', '*')
