@@ -80,53 +80,53 @@ export default function AdminDashboard() {
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-8">
-      <h1 className="text-white text-3xl font-bold mb-8">Admin Dashboard</h1>
+      <h1 className="text-white text-3xl font-extrabold mb-8">Admin <span className="bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">Dashboard</span></h1>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-        <div className="bg-[#2a2a2a] rounded-lg p-6 flex items-center gap-4 border-l-4 border-blue-500">
-          <div className="w-14 h-14 bg-blue-500/20 rounded-full flex items-center justify-center">
+        <div className="glass-card rounded-xl p-6 flex items-center gap-4 border-l-4 border-blue-500">
+          <div className="w-14 h-14 bg-blue-500/15 rounded-xl flex items-center justify-center">
             <DollarSign size={28} className="text-blue-400" />
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Total Revenue</p>
+            <p className="text-gray-500 text-sm">Total Revenue</p>
             <p className="text-white text-2xl font-bold">₹{stats?.total_revenue?.toLocaleString() || '0'}</p>
           </div>
         </div>
-        <div className="bg-[#2a2a2a] rounded-lg p-6 flex items-center gap-4 border-l-4 border-purple-500">
-          <div className="w-14 h-14 bg-purple-500/20 rounded-full flex items-center justify-center">
-            <BedDouble size={28} className="text-purple-400" />
+        <div className="glass-card rounded-xl p-6 flex items-center gap-4 border-l-4 border-violet-500">
+          <div className="w-14 h-14 bg-violet-500/15 rounded-xl flex items-center justify-center">
+            <BedDouble size={28} className="text-violet-400" />
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Active Bookings</p>
+            <p className="text-gray-500 text-sm">Active Bookings</p>
             <p className="text-white text-2xl font-bold">{stats?.active_bookings || 0}</p>
           </div>
         </div>
-        <div className="bg-[#2a2a2a] rounded-lg p-6 flex items-center gap-4 border-l-4 border-pink-500">
-          <div className="w-14 h-14 bg-pink-500/20 rounded-full flex items-center justify-center">
+        <div className="glass-card rounded-xl p-6 flex items-center gap-4 border-l-4 border-pink-500">
+          <div className="w-14 h-14 bg-pink-500/15 rounded-xl flex items-center justify-center">
             <Users size={28} className="text-pink-400" />
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Top Room Type</p>
+            <p className="text-gray-500 text-sm">Top Room Type</p>
             <p className="text-white text-xl font-bold">{stats?.top_room_type || 'N/A'}</p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-3 mb-6 border-b border-gray-700 pb-3">
+      <div className="flex gap-3 mb-6 border-b border-white/5 pb-3">
         <button
           onClick={() => setActiveTab('reservations')}
-          className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
-            activeTab === 'reservations' ? 'bg-white text-gray-900' : 'text-gray-400 hover:bg-gray-800'
+          className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+            activeTab === 'reservations' ? 'bg-gradient-to-r from-blue-500 to-violet-500 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:bg-white/5'
           }`}
         >
           All Reservations
         </button>
         <button
           onClick={() => setActiveTab('guests')}
-          className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
-            activeTab === 'guests' ? 'bg-white text-gray-900' : 'text-gray-400 hover:bg-gray-800'
+          className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+            activeTab === 'guests' ? 'bg-gradient-to-r from-blue-500 to-violet-500 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:bg-white/5'
           }`}
         >
           Guest Directory
@@ -134,12 +134,12 @@ export default function AdminDashboard() {
       </div>
 
       {/* Table */}
-      <div className="bg-[#2a2a2a] rounded-lg overflow-hidden">
+      <div className="glass-card rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           {activeTab === 'reservations' ? (
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-white/5 border-b border-gray-700">
+                <tr className="bg-white/5 border-b border-white/5">
                   <th className="px-5 py-3 text-gray-400 text-sm font-medium">ID</th>
                   <th className="px-5 py-3 text-gray-400 text-sm font-medium">Guest</th>
                   <th className="px-5 py-3 text-gray-400 text-sm font-medium">Room</th>
