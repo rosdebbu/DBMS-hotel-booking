@@ -234,7 +234,12 @@ export default function SearchResults() {
                       <Phone size={12} /> Call to Book
                     </button>
                     <button
-                      onClick={() => navigate('/book')}
+                      onClick={() => {
+                        const slug = room.hotel_name.replace(/\s+/g, '-').toLowerCase();
+                        const checkin = searchParams.get('checkin') || '';
+                        const checkout = searchParams.get('checkout') || '';
+                        navigate(`/hotel/${slug}?checkin=${checkin}&checkout=${checkout}`);
+                      }}
                       className="bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold px-6 py-2.5 rounded transition-colors w-full"
                     >
                       View Rooms
