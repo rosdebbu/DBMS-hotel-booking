@@ -3,9 +3,9 @@ import pool from '@/lib/db';
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id: guestId } = await params;
+  const guestId = params.id;
 
   try {
     await pool.query('DELETE FROM Guest WHERE guest_id = ?', [guestId]);

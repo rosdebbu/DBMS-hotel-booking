@@ -4,9 +4,9 @@ import { RowDataPacket } from 'mysql2';
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id: bookingId } = await params;
+  const bookingId = params.id;
   const connection = await pool.getConnection();
 
   try {

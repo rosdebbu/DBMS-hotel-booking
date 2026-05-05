@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MapPin, Star, ChevronLeft, ChevronRight, Wifi, Coffee, Car, UtensilsCrossed, ShieldCheck, Leaf, Users as UsersIcon, Maximize } from 'lucide-react';
 
@@ -24,8 +24,8 @@ const GALLERY_IMAGES = [
 
 const TABS = ['Rooms', 'Overview', 'Amenities', 'Location', 'Booking Policy', 'Guest Rating'];
 
-export default function HotelDetail({ params }: { params: Promise<{ hotelId: string }> }) {
-  const { hotelId } = use(params);
+export default function HotelDetail({ params }: { params: { hotelId: string } }) {
+  const hotelId = params.hotelId;
   const searchParams = useSearchParams();
   const router = useRouter();
   const [rooms, setRooms] = useState<Room[]>([]);
